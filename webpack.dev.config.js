@@ -1,0 +1,78 @@
+const path = require('path');
+const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+module.exports = {
+    devtool: 'inline-source-map',
+    entry:{
+        app:path.join(__dirname,'src/index.js'),//入口
+        vendor:['react','react-router-dom','react-dom']
+    },
+    output:{//输出
+        path:path.join(__dirname,'./dist'),
+        filename:'js/bundle.js',
+        chunkFilename:'js/[name].chunk.js'
+    },
+    devServer: {
+        //contentBase: path.join(__dirname, './dist')
+        port: 8080,
+        contentBase: path.join(__dirname, './dist'),
+        historyApiFallback: true,
+        //host: '0.0.0.0'
+    },
+    module:{
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                exclude:/node_modules/,
+                use: ['babel-loader?cacheDirectory=true'],//cacheDirectory用来缓存编译结果，下次编译加速
+                include: path.join(__dirname, 'src'),
+            },
+            {
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader', 
+                    use: ['css-loader']
+                })
+            },
+            {
+                test:/\.scss$/,
+                //use: ['style-loader','css-loader','sass-loader']
+                use:ExtractTextPlugin.extract({
+                    fallback:'style-loader',
+                    use:['css-loader','sass-loader']
+                })
+            },
+            {
+                test:[/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+                use: [{
+                    loader: 'url-loader',
+                    options: {
+                        limit: 8192,
+                        name:'images/[hash:8].[name].[ext]'
+                    }
+                }]
+            }
+        ]
+    },
+    plugins:[
+        new CleanWebpackPlugin(['dist']),//打包优化
+        new webpack.HashedModuleIdsPlugin(),//优化缓存
+        new HtmlWebpackPlugin({
+            filename:'index.html',
+            template:path.join(__dirname,'src/index.html'),
+            loader:'ejs-loader',//使用template时指定，否则生成的html不是期望的内容
+        }),
+        new webpack.optimize.RuntimeChunkPlugin({
+            name: "vendor"
+        }),
+        new ExtractTextPlugin({
+            filename: 'css/index.css',
+            allChunks: true
+        }),
+        new UglifyJSPlugin()
+    ],
+}
