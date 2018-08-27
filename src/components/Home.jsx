@@ -21,7 +21,7 @@ export default class Home extends Component {
         userStore.setName('fuxinlei');
     }
     componentWillMount(){
-        ajax.get('index',{name:'cathy'},(res)=>{
+        ajax.get('/index',{name:'cathy'},(res)=>{
     
         })
     }

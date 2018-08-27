@@ -9,7 +9,7 @@ module.exports = {
     devtool: 'inline-source-map',
     entry:{
         app:path.join(__dirname,'src/index.js'),//入口
-        vendor:['react','react-router-dom','react-dom']
+        vendor:['react','react-router-dom','react-dom','mobx','mobx-react']
     },
     output:{//输出
         path:path.join(__dirname,'./dist'),
@@ -17,11 +17,20 @@ module.exports = {
         chunkFilename:'js/[name].chunk.js'
     },
     devServer: {
-        //contentBase: path.join(__dirname, './dist')
-        port: 8080,
-        contentBase: path.join(__dirname, './dist'),
         historyApiFallback: true,
-        //host: '0.0.0.0'
+        //contentBase: path.join(__dirname, './dist'),
+        hot: true,
+        inline: true,
+        progress: true,
+        port: 8080,
+        //host: '10.0.0.9',
+        proxy: {
+            '/test/*': {
+                target: 'http://localhost',
+                changeOrigin: true,
+                secure: false
+            }
+        }
     },
     module:{
         rules: [
