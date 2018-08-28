@@ -7,14 +7,15 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 module.exports = {
     entry:{
         app:[
+            'babel-polyfill',
             path.join(__dirname,'src/index.js')
         ],
-        vendor:['react','react-router-dom','react-dom']
+        vendor:['react','react-router-dom','react-dom',]
     },
     output:{
         path:path.join(__dirname,'./dist'),
-        filename:'js/[name].[chunkhash:8].js',
-        chunkFilename:'js/[name].[chunkhash:8].chunk.js'
+        filename:'static/js/[name].[chunkhash:8].js',
+        chunkFilename:'static/js/[name].[chunkhash:8].chunk.js'
     },
     module:{
         rules: [
@@ -45,7 +46,7 @@ module.exports = {
                     loader: 'url-loader',
                     options: {
                         limit: 8192,
-                        name:'images/[hash:8].[name].[ext]'
+                        name:'static/images/[hash:8].[name].[ext]'
                     }
                 }]
             }
@@ -68,7 +69,7 @@ module.exports = {
             name: "vendor"
         }),
         new ExtractTextPlugin({
-            filename: 'css/[hash:8].[name].css',
+            filename: 'static/css/[hash:8].[name].css',
             allChunks: true
         }),
         new UglifyJSPlugin()

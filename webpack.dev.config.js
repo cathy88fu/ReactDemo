@@ -8,13 +8,16 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
     devtool: 'inline-source-map',
     entry:{
-        app:path.join(__dirname,'src/index.js'),//入口
+        app:[
+            'babel-polyfill',
+            path.join(__dirname,'src/index.js'),//入口
+        ],
         vendor:['react','react-router-dom','react-dom','mobx','mobx-react']
     },
     output:{//输出
         path:path.join(__dirname,'./dist'),
-        filename:'js/bundle.js',
-        chunkFilename:'js/[name].chunk.js'
+        filename:'static/js/bundle.js',
+        chunkFilename:'static/js/[name].chunk.js'
     },
     devServer: {
         historyApiFallback: true,
@@ -24,13 +27,13 @@ module.exports = {
         progress: true,
         port: 8080,
         //host: '10.0.0.9',
-        proxy: {
+        /* proxy: {
             '/test/*': {
                 target: 'http://localhost',
                 changeOrigin: true,
                 secure: false
             }
-        }
+        } */
     },
     module:{
         rules: [
@@ -61,7 +64,7 @@ module.exports = {
                     loader: 'url-loader',
                     options: {
                         limit: 8192,
-                        name:'images/[hash:8].[name].[ext]'
+                        name:'static/images/[hash:8].[name].[ext]'
                     }
                 }]
             }
@@ -79,9 +82,17 @@ module.exports = {
             name: "vendor"
         }),
         new ExtractTextPlugin({
-            filename: 'css/index.css',
+            filename: 'static/css/index.css',
             allChunks: true
         }),
         new UglifyJSPlugin()
     ],
+    resolve: {
+        alias: {
+            pages: path.join(__dirname, 'src/pages'),
+            components: path.join(__dirname, 'src/components'),
+            router: path.join(__dirname, 'src/router'),
+            stores: path.join(__dirname, 'src/stores'),
+        }
+    }
 }
