@@ -4,26 +4,32 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+// const HappyPack = require('happypack');
+const getClientEnvironment = require('./env');
+const _ENV  = getClientEnvironment('production');
+
 module.exports = {
+    // devtool: 'cheap-module-source-map',
     entry:{
         app:[
             'babel-polyfill',
             path.join(__dirname,'src/index.js')
         ],
-        vendor:['react','react-router-dom','react-dom',]
+        vendor:['react','react-router-dom','react-dom','mobx','mobx-react']
     },
     output:{
-        path:path.join(__dirname,'./dist'),
-        filename:'static/js/[name].[chunkhash:8].js',
-        chunkFilename:'static/js/[name].[chunkhash:8].chunk.js'
+        path:path.join(__dirname,'./'+_ENV.publicUrl),
+        chunkFilename:'static/js/[name].[chunkhash:8].chunk.js',
+        publicPath:''
     },
     module:{
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                exclude:/node_modules/,
-                use: ['babel-loader'],//cacheDirectory用来缓存编译结果，下次编译加速
+                //use:['happypack/loader?id=babel'],
+                use: ['babel-loader?cacheDirectory=true'],//cacheDirectory用来缓存编译结果，下次编译加速
                 include: path.join(__dirname, 'src'),
+                exclude:path.resolve(__dirname,'node_modules'),
             },
             {
                 test: /\.css$/,
@@ -41,29 +47,42 @@ module.exports = {
                 })
             },
             {
-                test:[/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+                test:/\.(bmp|gif|png|jpg|jpeg|woff|svg|ttf|eot)\??.*$/,
                 use: [{
                     loader: 'url-loader',
                     options: {
-                        limit: 8192,
-                        name:'static/images/[hash:8].[name].[ext]'
+                        limit: 10000,
+                        name:'static/images/[hash:8].[name].[ext]',
+                        publicPath:'/'+_ENV.publicUrl+'/'
                     }
-                }]
+                },{
+	            	loader:'image-webpack-loader',
+                    options:{
+                        bypassOnDebug: true
+                    }
+	            }]
             }
         ]
     },
     plugins:[
-        new webpack.DefinePlugin({
-            'process.env': {
-                'NODE_ENV': JSON.stringify('production')
-            }
-        }),
-        new CleanWebpackPlugin(['dist']),//打包优化
+        new webpack.DefinePlugin(_ENV.NODE_ENV),
+        new CleanWebpackPlugin([_ENV.publicUrl]),//打包优化
         new webpack.HashedModuleIdsPlugin(),//优化缓存
+        // new HappyPack({
+        //     id: 'babel',
+        //     loaders: [{
+        //       loader: 'babel-loader?cacheDirectory=true',
+        //     }],
+        //   }),
         new HtmlWebpackPlugin({
             filename:'index.html',
             template:path.join(__dirname,'src/index.html'),
             loader:'ejs-loader',//使用template时指定，否则生成的html不是期望的内容
+            minify: { // 压缩 HTML 的配置
+                collapseWhitespace: true,
+                removeComments: true,
+                useShortDoctype: true
+              }
         }),
         new webpack.optimize.RuntimeChunkPlugin({
             name: "vendor"
@@ -74,4 +93,12 @@ module.exports = {
         }),
         new UglifyJSPlugin()
     ],
+    resolve: {
+        alias: {
+            pages: path.join(__dirname, 'src/pages'),
+            components: path.join(__dirname, 'src/components'),
+            router: path.join(__dirname, 'src/router'),
+            stores: path.join(__dirname, 'src/stores'),
+        }
+    }
 }

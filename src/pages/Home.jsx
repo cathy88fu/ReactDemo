@@ -15,12 +15,12 @@ export default class Home extends Component {
             <Button type="primary" onClick={this.changeName.bind(this)}>changeName</Button>
         </div>)
     }
-    changeName(){
+    changeName = () => {
         const {userStore} = this.props;
         console.log(userStore);
         userStore.setName('fuxinlei');
     }
-    componentWillMount(){
+    componentWillMount = () => {
         ajax.get('/index',{name:'cathy'},(res)=>{
     
         })

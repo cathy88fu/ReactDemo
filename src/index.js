@@ -1,10 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import Hello from './components/Hello.jsx';
 import {BrowserRouter as Router, Link } from 'react-router-dom';
 import getRouter from 'router/router';
 import {Provider, observable, observer} from 'mobx-react'
 import userStore from 'stores/userStore'
+import VConsole from 'vconsole';
+if(TESTING){
+    const vconsole = new VConsole();
+}
 
 @observer
 export default class App extends React.Component {
