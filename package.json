@@ -49,7 +49,7 @@
     "css-loader": "^1.0.0",
     "happypack": "^5.0.1",
     "image-webpack-loader": "^5.0.0",
-    "node-sass": "^4.9.3",
+    "node-sass": "^4.13.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-router-dom": "^4.3.1",
